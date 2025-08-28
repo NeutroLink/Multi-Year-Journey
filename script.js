@@ -10,7 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const notification = document.getElementById('notification');
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
+    const currentDateDisplay = document.getElementById('currentDate');
     const applyDatesButton = document.getElementById('applyDates');
+    const maxAmountInput = document.getElementById('maxAmount');
+    const customAmountInput = document.getElementById('customAmount');
+    const applyMaxAmountButton = document.getElementById('applyMaxAmount');
+    const setCustomAmountButton = document.getElementById('setCustomAmount');
+    const minAmountLabel = document.getElementById('minAmountLabel');
+    const maxAmountLabel = document.getElementById('maxAmountLabel');
     
     // Default dates
     let startDate = new Date();
@@ -19,11 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let endDate = new Date(startDate);
     endDate.setFullYear(endDate.getFullYear() + 7); // 7 years from start
     
+    // Default financial settings
+    let maxAmount = 150000;
+    
     // Load saved data from localStorage
     let savedWeeks = JSON.parse(localStorage.getItem('journeyWeeks')) || {};
     let savedSliderValue = localStorage.getItem('journeySliderValue') || 0;
     let savedStartDate = localStorage.getItem('journeyStartDate') || startDate.toISOString().split('T')[0];
     let savedEndDate = localStorage.getItem('journeyEndDate') || endDate.toISOString().split('T')[0];
+    let savedMaxAmount = localStorage.getItem('journeyMaxAmount') || maxAmount;
     
     // Set the date inputs to the saved dates
     startDateInput.value = savedStartDate;
@@ -31,10 +42,28 @@ document.addEventListener('DOMContentLoaded', function() {
     startDate = new Date(savedStartDate);
     endDate = new Date(savedEndDate);
     
+    // Set financial values
+    maxAmount = parseInt(savedMaxAmount);
+    maxAmountInput.value = maxAmount;
+    moneySlider.max = maxAmount;
+    maxAmountLabel.textContent = `$${maxAmount.toLocaleString()}`;
+    
     // Format date as "Month Day, Year"
     function formatDate(date) {
         const options = { month: 'short', day: 'numeric', year: 'numeric' };
         return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Format date with day of week
+    function formatFullDate(date) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    // Update current date display
+    function updateCurrentDate() {
+        const now = new Date();
+        currentDateDisplay.textContent = formatFullDate(now);
     }
     
     // Calculate total weeks between two dates
@@ -53,6 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save slider value to localStorage
     function saveSliderValue(value) {
         localStorage.setItem('journeySliderValue', value);
+    }
+    
+    // Save max amount to localStorage
+    function saveMaxAmount(value) {
+        localStorage.setItem('journeyMaxAmount', value);
     }
     
     // Save dates to localStorage
@@ -199,11 +233,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update slider progress bar
     function updateSlider() {
         const value = moneySlider.value;
-        const percentage = (value / 150000) * 100;
+        const percentage = (value / maxAmount) * 100;
         
         currentValue.textContent = `$${parseInt(value).toLocaleString()}`;
         progressFill.style.width = `${percentage}%`;
         progressPercent.textContent = `${percentage.toFixed(1)}%`;
+        
+        // Update custom amount input to match slider
+        customAmountInput.value = value;
         
         // Save slider value
         saveSliderValue(value);
@@ -275,14 +312,73 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('Journey timeline updated successfully');
     });
     
+    // Apply max amount
+    applyMaxAmountButton.addEventListener('click', function() {
+        const newMaxAmount = parseInt(maxAmountInput.value);
+        
+        // Validate max amount
+        if (isNaN(newMaxAmount) || newMaxAmount < 1) {
+            showNotification('Please enter a valid maximum amount', true);
+            return;
+        }
+        
+        // Update max amount
+        maxAmount = newMaxAmount;
+        moneySlider.max = maxAmount;
+        maxAmountLabel.textContent = `$${maxAmount.toLocaleString()}`;
+        saveMaxAmount(maxAmount);
+        
+        // Ensure current value doesn't exceed new max
+        if (parseInt(moneySlider.value) > maxAmount) {
+            moneySlider.value = maxAmount;
+            updateSlider();
+        }
+        
+        // Update custom amount input max
+        customAmountInput.max = maxAmount;
+        
+        showNotification(`Maximum amount updated to $${maxAmount.toLocaleString()}`);
+    });
+    
+    // Set custom amount
+    setCustomAmountButton.addEventListener('click', function() {
+        const customAmount = parseInt(customAmountInput.value);
+        
+        // Validate custom amount
+        if (isNaN(customAmount) || customAmount < 0) {
+            showNotification('Please enter a valid amount', true);
+            return;
+        }
+        
+        if (customAmount > maxAmount) {
+            showNotification(`Amount cannot exceed maximum of $${maxAmount.toLocaleString()}`, true);
+            return;
+        }
+        
+        // Set slider value
+        moneySlider.value = customAmount;
+        updateSlider();
+        showNotification(`Amount set to $${customAmount.toLocaleString()}`);
+    });
+    
+    // Update custom amount input when slider changes
+    moneySlider.addEventListener('input', function() {
+        customAmountInput.value = this.value;
+    });
+    
     // Set slider value from saved data
     moneySlider.value = savedSliderValue;
+    customAmountInput.value = savedSliderValue;
     
     moneySlider.addEventListener('input', updateSlider);
     
     // Initialize
+    updateCurrentDate();
     buildYearsGrid();
     updateSlider();
+    
+    // Update current date every minute
+    setInterval(updateCurrentDate, 60000);
     
     // Check for newly passed weeks every minute
     setInterval(checkForNewlyPassedWeeks, 60000);
