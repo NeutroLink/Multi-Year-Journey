@@ -69,6 +69,17 @@ h1 {
     width: 150px;
 }
 
+.date-display {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 150px;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
 .apply-button {
     background-color: #3498db;
     color: white;
@@ -78,7 +89,6 @@ h1 {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    margin-top: 10px;
 }
 
 .apply-button:hover {
@@ -268,6 +278,35 @@ h1 {
     color: #7f8c8d;
 }
 
+.slider-customization {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+}
+
+.slider-custom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.slider-custom-row label {
+    font-weight: 500;
+    color: #34495e;
+    min-width: 140px;
+}
+
+.amount-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 120px;
+    text-align: right;
+}
+
 /* Tooltip styles */
 .tooltip {
     position: absolute;
@@ -327,6 +366,15 @@ h1 {
     .date-input-row {
         flex-direction: column;
         gap: 10px;
+    }
+    
+    .slider-custom-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .slider-custom-row label {
+        min-width: auto;
     }
     
     .year-column {
