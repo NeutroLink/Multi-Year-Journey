@@ -22,6 +22,10 @@
                     <label for="endDate">End Date:</label>
                     <input type="date" id="endDate" class="date-input">
                 </div>
+                <div class="date-input-row">
+                    <label>Current Date:</label>
+                    <span id="currentDate" class="date-display"></span>
+                </div>
             </div>
             <div style="text-align: center;">
                 <button id="applyDates" class="apply-button">Apply Dates</button>
@@ -54,9 +58,9 @@
             <h2 class="financial-title">Financial Goal Progress</h2>
             <div class="slider-container">
                 <div class="slider-label">
-                    <span>$0</span>
+                    <span id="minAmountLabel">$0</span>
                     <span class="slider-value" id="currentValue">$0</span>
-                    <span>$150,000</span>
+                    <span id="maxAmountLabel">$150,000</span>
                 </div>
                 <div class="slider-wrapper">
                     <div class="progress-bar" id="progressBar">
@@ -67,6 +71,19 @@
                 <div class="slider-info">
                     <span>Drag to adjust your financial progress</span>
                     <span id="progressPercent">0%</span>
+                </div>
+            </div>
+            
+            <div class="slider-customization">
+                <div class="slider-custom-row">
+                    <label for="maxAmount">Max Amount ($):</label>
+                    <input type="number" id="maxAmount" class="amount-input" min="1" step="1000" value="150000">
+                    <button id="applyMaxAmount" class="apply-button">Apply</button>
+                </div>
+                <div class="slider-custom-row">
+                    <label for="customAmount">Set Amount ($):</label>
+                    <input type="number" id="customAmount" class="amount-input" min="0" step="1000" value="0">
+                    <button id="setCustomAmount" class="apply-button">Set</button>
                 </div>
             </div>
         </div>
